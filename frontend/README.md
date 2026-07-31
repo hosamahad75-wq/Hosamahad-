@@ -44,6 +44,12 @@ All shadcn/ui components have been downloaded under `@/components/ui`.
 - The `@/` path alias points to the `src/` directory
 - Do NOT modify the title, description, and logo in `index.html` — they are managed by the overview system via `data-mgx-overview` markers.
 
+## Production Build Notes
+
+- Copy `.env.example` to `.env.production` or configure the environment variables directly in your deployment platform.
+- Set `VITE_API_BASE_URL` to the public backend origin that serves the `/api/v1` routes.
+- For local development, use the default `http://127.0.0.1:8000` value.
+
 # Commands
 
 **Install Dependencies**
