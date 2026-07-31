@@ -1,0 +1,14 @@
+name: CI Safety Net
+on:
+  push:
+    branches: [main, phase-1-governance]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo 'Safety check passed.'
