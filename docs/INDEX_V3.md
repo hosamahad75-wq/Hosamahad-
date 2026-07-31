@@ -4,7 +4,7 @@ Author: GitHub Copilot (@copilot)
 Date: 2026-07-31
 Branch: feature/v3-ci-safety-gate
 
-This index points to the Phase A documentation and forensic reports produced for HUSSAM PLATFORM V3.0. All files live under /docs on branch feature/v3-ci-safety-gate. These reports are draft — for internal validation.
+This index points to the Phase A documentation and forensic reports produced for HUSSAM PLATFORM V3.0. All files live under /docs on branch feature/v3-ci-safety-gate. These reports are draft — for review and validation.
 
 Reports
 
@@ -16,7 +16,6 @@ Reports
 - [DEPENDENCY_GRAPH.md](DEPENDENCY_GRAPH.md) — Dependency graph and implementation order.
 - [EXECUTION_TIMELINE.md](EXECUTION_TIMELINE.md) — High-level timeline and milestones.
 - [RISK_REGISTER.md](RISK_REGISTER.md) — Risk register with mitigations and owners.
-- [FEATURE_COMPLETION_MATRIX.md](FEATURE_COMPLETION_MATRIX.md)
 - [PHASE_A_REPORT.md](PHASE_A_REPORT.md) — Documentation Completion Report (validation checklist & results).
 
 How to use
