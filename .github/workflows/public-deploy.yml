@@ -1,0 +1,70 @@
+name: Public Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-backend:
+    name: Deploy FastAPI backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger backend deploy
+        if: ${{ secrets.RENDER_DEPLOY_HOOK_URL != '' }}
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL"
+
+      - name: Warn when backend hook is not configured
+        if: ${{ secrets.RENDER_DEPLOY_HOOK_URL == '' }}
+        run: echo "Set the RENDER_DEPLOY_HOOK_URL secret to publish the FastAPI backend."
+
+  deploy-frontend:
+    name: Deploy React frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend bundle
+        working-directory: frontend
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || 'https://your-backend-url.example' }}
+          VITE_APP_NAME: ${{ vars.VITE_APP_NAME || 'Hosamahad Platform' }}
+          VITE_APP_ENV: production
+        run: pnpm build
+
+      - name: Publish frontend to Vercel
+        if: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./frontend
+          vercel-args: --prod
+
+      - name: Warn when Vercel secrets are missing
+        if: ${{ secrets.VERCEL_TOKEN == '' || secrets.VERCEL_ORG_ID == '' || secrets.VERCEL_PROJECT_ID == '' }}
+        run: echo "Configure VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID to publish the frontend."
