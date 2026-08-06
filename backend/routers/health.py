@@ -1,11 +1,8 @@
 from fastapi import APIRouter
-from services.database import check_database_health
+from datetime import datetime
 
-router = APIRouter(prefix="/database", tags=["database"])
-
+router = APIRouter(prefix="/api/v1", tags=["status"])
 
 @router.get("/health")
-async def database_health_check():
-    """Check database connection health"""
-    is_healthy = await check_database_health()
-    return {"status": "healthy" if is_healthy else "unhealthy", "service": "database"}
+def health():
+    return {"status": "ok", "timestamp": datetime.utcnow().isoformat() + "Z"}
