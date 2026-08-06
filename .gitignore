@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.pnpm-store/
+__pycache__/
+*.pyc
+.env
+.env.*
+logs/
+.venv/
+venv/
