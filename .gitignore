@@ -1,3 +1,4 @@
+# .gitignore — ensure sensitive and generated files are ignored
 node_modules/
 dist/
 .pnpm-store/
@@ -8,3 +9,7 @@ __pycache__/
 logs/
 .venv/
 venv/
+# keep examples only
+!.env.example
+backend/.env.example
+frontend/.env.example
