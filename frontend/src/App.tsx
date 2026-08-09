@@ -1,45 +1,14 @@
-import { Toaster } from '@/components/ui/sonner';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Index from './pages/Index';
-import Dashboard from './pages/Dashboard';
-import CompilerSimulator from './pages/CompilerSimulator';
-import LedgerManager from './pages/LedgerManager';
-import AISyncMonitor from './pages/AISyncMonitor';
-import Marketplace from './pages/Marketplace';
-import LogisticsHub from './pages/LogisticsHub';
-import PaymentGateways from './pages/PaymentGateways';
-import AuthCallback from './pages/AuthCallback';
-import AuthError from './pages/AuthError';
+import React from 'react'
+import PaymentsPanel from './components/payments/PaymentsPanel'
 
-const queryClient = new QueryClient();
+function App() {
+  return (
+    <div className="min-h-screen bg-[radial-gradient(ellipse at_top_left,_#071122,_#02040A)] text-white p-6">
+      <div className="max-w-4xl mx-auto">
+        <PaymentsPanel />
+      </div>
+    </div>
+  )
+}
 
-const AppRoutes = () => (
-  <Routes>
-    <Route path="/" element={<Index />} />
-    <Route path="/dashboard" element={<Dashboard />} />
-    <Route path="/compiler" element={<CompilerSimulator />} />
-    <Route path="/ledger" element={<LedgerManager />} />
-    <Route path="/ai-sync" element={<AISyncMonitor />} />
-    <Route path="/marketplace" element={<Marketplace />} />
-    <Route path="/logistics" element={<LogisticsHub />} />
-    <Route path="/payments" element={<PaymentGateways />} />
-    <Route path="/auth/callback" element={<AuthCallback />} />
-    <Route path="/auth/error" element={<AuthError />} />
-  </Routes>
-);
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
-
-export default App;
-export { AppRoutes };
+export default App
