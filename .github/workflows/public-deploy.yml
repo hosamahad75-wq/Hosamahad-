@@ -1,70 +1,27 @@
 name: Public Deploy
-
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
-
-permissions:
-  contents: read
+    branches: [ main ]
 
 jobs:
-  deploy-backend:
-    name: Deploy FastAPI backend
+  deploy:
+    name: Deploy Application
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger backend deploy
-        if: ${{ secrets.RENDER_DEPLOY_HOOK_URL != '' }}
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Render (Backend)
         env:
-          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          RENDER_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        if: ${{ env.RENDER_HOOK != '' }}
         run: |
-          curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL"
+          curl -X POST "$RENDER_HOOK"
 
-      - name: Warn when backend hook is not configured
-        if: ${{ secrets.RENDER_DEPLOY_HOOK_URL == '' }}
-        run: echo "Set the RENDER_DEPLOY_HOOK_URL secret to publish the FastAPI backend."
-
-  deploy-frontend:
-    name: Deploy React frontend
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-          cache-dependency-path: frontend/pnpm-lock.yaml
-
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: pnpm install --frozen-lockfile
-
-      - name: Build frontend bundle
-        working-directory: frontend
+      - name: Deploy to Netlify (Frontend)
         env:
-          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || 'https://your-backend-url.example' }}
-          VITE_APP_NAME: ${{ vars.VITE_APP_NAME || 'Hosamahad Platform' }}
-          VITE_APP_ENV: production
-        run: pnpm build
-
-      - name: Publish frontend to Vercel
-        if: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./frontend
-          vercel-args: --prod
-
-      - name: Warn when Vercel secrets are missing
-        if: ${{ secrets.VERCEL_TOKEN == '' || secrets.VERCEL_ORG_ID == '' || secrets.VERCEL_PROJECT_ID == '' }}
-        run: echo "Configure VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID to publish the frontend."
+          NETLIFY_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        if: ${{ env.NETLIFY_TOKEN != '' && env.NETLIFY_SITE_ID != '' }}
+        run: |
+          npm install -g netlify-cli
+          netlify deploy --prod --dir=frontend/dist --auth="$NETLIFY_TOKEN" --site="$NETLIFY_SITE_ID"
