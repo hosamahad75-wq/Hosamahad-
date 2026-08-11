@@ -1,9 +1,13 @@
 # Simple unit tests for the new services
-from backend.services.compiler.pipeline import compile_hus
-from backend.services.ledger import Ledger, read_escrow, write_escrow
-from backend.services.logistics import calculate_shipping
 import os
+import sys
 import tempfile
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from services.compiler.pipeline import compile_hus
+from services.ledger import Ledger, read_escrow, write_escrow
+from services.logistics import calculate_shipping
 
 
 def test_compiler_basic():

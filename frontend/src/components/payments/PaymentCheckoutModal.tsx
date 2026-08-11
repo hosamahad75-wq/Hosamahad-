@@ -1,5 +1,5 @@
 import React from "react";
-import QRCode from "qrcode.react";
+import { QRCodeCanvas } from "qrcode.react";
 import { CreatePaymentResponse } from "@/types/payments";
 
 interface Props {
@@ -24,7 +24,7 @@ export default function PaymentCheckoutModal({ session, onClose }: Props) {
         {/* Al-Kuraimi (QR) */}
         {metadata.reference && metadata.qr_url && (
           <div className="flex flex-col items-center gap-3">
-            <QRCode value={metadata.qr_url} size={180} fgColor="#00e5ff" bgColor="#0b1220" />
+            <QRCodeCanvas value={metadata.qr_url} size={180} fgColor="#00e5ff" bgColor="#0b1220" />
             <div className="text-sm text-neutral-300">Reference: <span className="font-mono ml-2">{metadata.reference}</span></div>
             <div className="flex gap-2 mt-2">
               <a href={metadata.qr_url} target="_blank" rel="noreferrer" className="px-4 py-2 rounded-md bg-cyan-600 text-black font-semibold">Open</a>

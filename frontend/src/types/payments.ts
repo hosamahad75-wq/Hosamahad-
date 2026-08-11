@@ -11,9 +11,8 @@ export interface CreatePaymentRequest {
 export interface CreatePaymentResponse {
   session_id: string;
   provider: string;
-<<<<<<< HEAD
-  next_action: string;
-  metadata: Record<string, any>;
+  next_action?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface VerifyPaymentRequest {
@@ -21,15 +20,7 @@ export interface VerifyPaymentRequest {
 }
 
 export interface VerifyPaymentResponse {
-  session_id: string;
-  status: "pending" | "paid" | "failed" | "cancelled";
-  details: Record<string, any>;
-=======
-  metadata?: Record<string, any>;
-}
-
-export interface VerifyPaymentResponse {
+  session_id?: string;
   status: "pending" | "paid" | "failed" | "cancelled";
   details?: any;
->>>>>>> 307b69d4 (fix(types,ci,payments): add payment types, fix stale closure in status polling, and add qrcode package)
 }

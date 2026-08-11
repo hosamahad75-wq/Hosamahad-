@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { VerifyPaymentResponse } from "@/types/payments";
 
 interface Props {
@@ -10,6 +10,7 @@ export default function PaymentStatus({ sessionId, onPaid }: Props) {
   const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const statusRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -17,6 +18,7 @@ export default function PaymentStatus({ sessionId, onPaid }: Props) {
     setLoading(true);
     setError(null);
     setStatus("pending");
+    statusRef.current = "pending";
 
     const check = async () => {
       try {
@@ -29,9 +31,10 @@ export default function PaymentStatus({ sessionId, onPaid }: Props) {
         const data: VerifyPaymentResponse = await res.json();
         if (stopped) return;
         setStatus(data.status);
+        statusRef.current = data.status;
         setLoading(false);
         if (data.status === "paid") {
-          onPaid && onPaid(data.details);
+          onPaid?.(data.details);
         }
       } catch (err: any) {
         setError(err.message || String(err));
@@ -44,7 +47,7 @@ export default function PaymentStatus({ sessionId, onPaid }: Props) {
     check();
     const iv = setInterval(() => {
       attempts += 1;
-      if (attempts >= 20 || status === "paid") {
+      if (attempts >= 20 || statusRef.current === "paid") {
         clearInterval(iv);
         return;
       }
