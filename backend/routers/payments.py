@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from uuid import uuid4
 from typing import Dict
-from ..services.ledger import read_escrow, write_escrow, Ledger
-from ..schemas.payments import CreatePaymentRequest, CreatePaymentResponse, VerifyPaymentRequest, VerifyPaymentResponse
+from services.ledger import read_escrow, write_escrow, Ledger
+from schemas.payments import CreatePaymentRequest, CreatePaymentResponse, VerifyPaymentRequest, VerifyPaymentResponse
 
 router = APIRouter(prefix="/api/v1/payments", tags=["payments"])
 

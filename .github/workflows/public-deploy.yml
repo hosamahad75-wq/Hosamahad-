@@ -17,6 +17,17 @@ jobs:
         run: |
           curl -X POST "$RENDER_HOOK"
 
+      - name: Install frontend dependencies
+        run: |
+          npm install -g pnpm
+          cd frontend
+          pnpm install
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          pnpm build
+
       - name: Deploy to Netlify (Frontend)
         env:
           NETLIFY_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
