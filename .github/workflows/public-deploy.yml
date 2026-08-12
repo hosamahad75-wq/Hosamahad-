@@ -13,8 +13,11 @@ jobs:
       - name: Deploy to Render (Backend)
         env:
           RENDER_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
-        if: ${{ env.RENDER_HOOK != '' }}
         run: |
+          if [ -z "$RENDER_HOOK" ]; then
+            echo "WARNING: RENDER_DEPLOY_HOOK secret is missing. Skipping Render backend deployment."
+            exit 0
+          fi
           curl -X POST "$RENDER_HOOK"
 
       - name: Install frontend dependencies
@@ -32,7 +35,10 @@ jobs:
         env:
           NETLIFY_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        if: ${{ env.NETLIFY_TOKEN != '' && env.NETLIFY_SITE_ID != '' }}
         run: |
+          if [ -z "$NETLIFY_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
+            echo "WARNING: NETLIFY_AUTH_TOKEN or NETLIFY_SITE_ID is missing. Skipping Netlify frontend deployment."
+            exit 0
+          fi
           npm install -g netlify-cli
           netlify deploy --prod --dir=frontend/dist --auth="$NETLIFY_TOKEN" --site="$NETLIFY_SITE_ID"
