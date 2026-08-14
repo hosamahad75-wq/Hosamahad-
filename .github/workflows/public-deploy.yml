@@ -10,28 +10,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - name: Deploy to Render (Backend)
         env:
           RENDER_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
           if [ -z "$RENDER_HOOK" ]; then
             echo "WARNING: RENDER_DEPLOY_HOOK secret is missing. Skipping Render backend deployment."
-            exit 0
+          else
+            curl -X POST "$RENDER_HOOK"
           fi
-          curl -X POST "$RENDER_HOOK"
 
-      - name: Install frontend dependencies
-        run: |
-          npm install -g pnpm
-          cd frontend
-          pnpm install
-
-      - name: Build frontend
-        run: |
-          cd frontend
-          pnpm build
-
-      - name: Deploy to Netlify (Frontend)
+      - name: Build & Deploy Frontend to Netlify
         env:
           NETLIFY_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
@@ -40,5 +34,10 @@ jobs:
             echo "WARNING: NETLIFY_AUTH_TOKEN or NETLIFY_SITE_ID is missing. Skipping Netlify frontend deployment."
             exit 0
           fi
-          npm install -g netlify-cli
-          netlify deploy --prod --dir=frontend/dist --auth="$NETLIFY_TOKEN" --site="$NETLIFY_SITE_ID"
+
+          npm install -g pnpm netlify-cli
+          cd frontend
+          pnpm config set ignore-scripts false
+          pnpm install
+          pnpm build
+          netlify deploy --prod --dir=dist --auth="$NETLIFY_TOKEN" --site="$NETLIFY_SITE_ID"
