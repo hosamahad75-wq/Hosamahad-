@@ -1,43 +1,43 @@
-name: Public Deploy
+name: Deploy to GitHub Pages
+
 on:
   push:
     branches: [ main ]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
-  deploy:
-    name: Deploy Application
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Deploy to Render (Backend)
-        env:
-          RENDER_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+      - name: Install & Build Frontend
         run: |
-          if [ -z "$RENDER_HOOK" ]; then
-            echo "WARNING: RENDER_DEPLOY_HOOK secret is missing. Skipping Render backend deployment."
-          else
-            curl -X POST "$RENDER_HOOK"
-          fi
-
-      - name: Build & Deploy Frontend to Netlify
-        env:
-          NETLIFY_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: |
-          if [ -z "$NETLIFY_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
-            echo "WARNING: NETLIFY_AUTH_TOKEN or NETLIFY_SITE_ID is missing. Skipping Netlify frontend deployment."
-            exit 0
-          fi
-
-          npm install -g pnpm netlify-cli
+          npm install -g pnpm
           cd frontend
           pnpm config set ignore-scripts false
           pnpm install
           pnpm build
-          netlify deploy --prod --dir=dist --auth="$NETLIFY_TOKEN" --site="$NETLIFY_SITE_ID"
+
+      - name: Upload Artifact to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'frontend/dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
